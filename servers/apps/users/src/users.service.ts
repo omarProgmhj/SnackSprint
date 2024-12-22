@@ -15,7 +15,7 @@ interface UserData {
   name: string;
   email: string;
   password: string;
-  phone_number: string;
+  phone_number: number ;
 }
 @Injectable()
 export class UsersService {
@@ -29,12 +29,12 @@ export class UsersService {
   // register user 
   async register(RegisterDto: RegisterDto, response: Response) {
     const { name, email, password, phone_number } = RegisterDto;
+
     const isEmailExist = await this.prisma.user.findUnique({
       where: {
         email: email,
       }
     })
-
     if (isEmailExist) { throw new BadRequestException('User already exist with this email!'); }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -43,10 +43,10 @@ export class UsersService {
       data: {
         name,
         email,
-        password: hashedPassword,
+        password,
         phone_number,
-      }
-    })
+      },
+    });
 
     const isPhoneNumberisUnique = await this.prisma.user.findUnique({
       where: {
@@ -54,6 +54,11 @@ export class UsersService {
       },
     });
     if (isPhoneNumberisUnique) { throw new BadRequestException('phone number already exist with this phone')}
+
+    const activationToken = await this.createActivationToken(user);
+
+    const activationCode = activationToken.activationCode;
+
 
     return { user, response }
   }
