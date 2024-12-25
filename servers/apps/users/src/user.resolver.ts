@@ -28,6 +28,8 @@ export class UserResolver {
         return { user };
     }
 
+    
+
     @Query(() => [User])
     async getUsers() {
         return this.usersService.getUsers();
