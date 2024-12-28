@@ -17,7 +17,7 @@ export class RegisterResponse {
   user?: User;
   
   @Field({nullable: true})
-  activation_token?: string; // let's put it optional just now 
+  activation_token: string; // let's put it optional just now 
 
   @Field(() => ErrorType, { nullable: true })
   error?: ErrorType;
@@ -26,7 +26,7 @@ export class RegisterResponse {
 @ObjectType()
 export class ActivationResponse {
   @Field(() => User)
-  user: User | unknown;
+  user: User | any;
 
   @Field(() => ErrorType, { nullable: true })
   error?: ErrorType;
