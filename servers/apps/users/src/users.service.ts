@@ -9,6 +9,7 @@ import { response, Response } from 'express';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { EmailService } from './email/email.service';
+import { TokenSender } from './utils/sendToken';
 
 
 
@@ -126,12 +127,31 @@ export class UsersService {
   // Login service
   async Login(loginDto: LoginDto) {
     const { email, password } = loginDto;
-    const user = {
-      email,
-      password,
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (user && (await this.comparePassword(password, user.password))) {
+      const tokenSender = new TokenSender(this.ConfigService, this.JwtService);
+      return tokenSender.sendToken(user);
+    } else {
+      return {
+        user: null,
+        accessToken: null,
+        refreshToken: null,
+        error: {
+          message: 'Invalid email or password',
+        },
+      };
     }
-    return user;
   }
+
+  async comparePassword(password: string, hashedPassword: string ): Promise<boolean> {
+    return await bcrypt.compare(password, hashedPassword);
+  }
+
 
   // get all users service 
   async getUsers() {
