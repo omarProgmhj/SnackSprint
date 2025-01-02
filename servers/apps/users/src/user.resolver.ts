@@ -1,6 +1,6 @@
 import { Args, Context, Mutation, Resolver, Query } from "@nestjs/graphql";
 import { UsersService } from './users.service';
-import { ActivationResponse, RegisterResponse } from './types/user.types';
+import { ActivationResponse, LoginResponse, RegisterResponse } from './types/user.types';
 import { ActivationDto, RegisterDto } from "./dto/user.dto";
 import { BadRequestException } from "@nestjs/common";
 import { User } from './entities/user.entity';
@@ -32,7 +32,13 @@ export class UserResolver {
 
     }
 
-    
+    @Mutation(() => LoginResponse)
+    async Login(
+        @Args('email') email: string,
+        @Args('password') password: string,
+    ): Promise<LoginResponse> {
+        return await this.usersService.Login({ email, password });
+    }
     
 
     @Query(() => [User])
