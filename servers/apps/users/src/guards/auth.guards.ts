@@ -1,13 +1,13 @@
-import { ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from "prisma/Prisma.service";
+import { PrismaService } from "../../../../prisma/Prisma.service";
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 
 
 @Injectable()
-export class AuthGards {
+export class AuthGards implements CanActivate {
     constructor(
         private readonly jwtService: JwtService,
         private readonly prisma: PrismaService,
@@ -18,8 +18,8 @@ export class AuthGards {
         const gqlContext = GqlExecutionContext.create(context);
         const req = gqlContext.getContext();
 
-        const accessToken = req.headers.accessToken as string;
-        const refreshToken = req.headers.refreshToken as string;
+        const accessToken = req.headers.accesstoken as string;
+        const refreshToken = req.headers.refreshtoken as string;
 
         if (!accessToken || !refreshToken) {
             throw new UnauthorizedException("Please login to access to this resource!");
@@ -33,14 +33,14 @@ export class AuthGards {
             if(!decoded) {
                 throw new UnauthorizedException("Invalid access token!");
             }
-            
+            await this.updateAccessToken(req); 
         }
         return true
     }
 
     private async updateAccessToken(req: any): Promise<void> {
         try {
-            const refreshToken = req.headers.refreshToken as string;
+            const refreshToken = req.headers.refreshtoken as string;
             const decoded = this.jwtService.verify(refreshToken, {
                 secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
             });

@@ -153,6 +153,14 @@ export class UsersService {
   }
 
 
+  // get logged in user 
+  async getLoggedInUser(req: any) {
+    const user = req.user;
+    const refreshtoken = req.refreshToken;
+    const accesstoken = req.accessToken 
+    return { user, refreshtoken, accesstoken}
+  }
+
   // get all users service 
   async getUsers() {
     return this.prisma.user.findMany({});
