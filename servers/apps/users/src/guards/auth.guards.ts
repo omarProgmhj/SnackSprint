@@ -16,10 +16,13 @@ export class AuthGards implements CanActivate {
 
     async canActivate(context: ExecutionContext):Promise<boolean> {
         const gqlContext = GqlExecutionContext.create(context);
-        const req = gqlContext.getContext();
+        const { req } = gqlContext.getContext();
 
-        const accessToken = req.headers.accesstoken as string;
-        const refreshToken = req.headers.refreshtoken as string;
+        console.log('GraphQL Context:', gqlContext);
+        console.log('Request Headers:', req.headers);
+
+        const accessToken = req.headers.accesstoken ;
+        const refreshToken = req.headers.refreshtoken;
 
         if (!accessToken || !refreshToken) {
             throw new UnauthorizedException("Please login to access to this resource!");
@@ -44,13 +47,16 @@ export class AuthGards implements CanActivate {
             const decoded = this.jwtService.verify(refreshToken, {
                 secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
             });
+
+            console.log('Decoded Access Token:', decoded);
+            
             if (!decoded) {
                 throw new UnauthorizedException("Invalid refresh token!");
             }
 
             const user = await this.prisma.user.findUnique({
                 where: {
-                    id: decoded.userId,
+                    id: decoded.id,
                 }
             });
 
@@ -64,8 +70,8 @@ export class AuthGards implements CanActivate {
                 },
             );
 
-            req.accesstoken = accessToken;
-            req.refreshtoken = refreshToken;
+            req.accessToken = accessToken;
+            req.refreshToken = refreshToken;
             req.user = user;
 
         } catch(error) {
