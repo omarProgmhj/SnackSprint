@@ -27,6 +27,7 @@ export class UsersService {
     private readonly ConfigService: ConfigService,
     private readonly EmailService: EmailService,
   ) {}
+  
 
 
   // register user 
@@ -155,6 +156,7 @@ export class UsersService {
 
   // get logged in user 
   async getLoggedInUser(req: any) {
+    console.log('Request Object:', req)
     const user = req.user;
     const refreshtoken = req.refreshToken;
     const accesstoken = req.accessToken 

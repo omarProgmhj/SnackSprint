@@ -44,6 +44,7 @@ export class UserResolver {
     @Query(() => LoginResponse)
     @UseGuards(AuthGards)
     async getLoggedInUser(@Context() context: { req: Request }) {
+        console.log('Full Request:', context.req);
         return await this.usersService.getLoggedInUser(context.req);
     } 
     

@@ -7,6 +7,6 @@ export class UsersController {
 
   @Get()
   getHello(): string {
-    return 
+    return 'Helo world!'
   }
 }

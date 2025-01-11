@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { GraphQLModule } from '@nestjs/graphql';
+import { GraphQLModule, Context } from '@nestjs/graphql';
 import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -18,7 +18,8 @@ import { EmailModule } from './email/email.module';
       driver: ApolloFederationDriver,
       autoSchemaFile: {
         federation: 2,
-      }
+      },
+      context: ({ req }) => ({ req }), // to make sure that the request object is availablein the GraphQL context
     }),
     EmailModule
   ],
