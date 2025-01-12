@@ -18,9 +18,6 @@ export class AuthGards implements CanActivate {
         const gqlContext = GqlExecutionContext.create(context);
         const { req } = gqlContext.getContext();
 
-        console.log('GraphQL Context:', gqlContext);
-        console.log('Request Headers:', req.headers);
-
         const accessToken = req.headers.accesstoken ;
         const refreshToken = req.headers.refreshtoken;
 
@@ -48,7 +45,6 @@ export class AuthGards implements CanActivate {
                 secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
             });
 
-            console.log('Decoded Access Token:', decoded);
             
             if (!decoded) {
                 throw new UnauthorizedException("Invalid refresh token!");
@@ -70,8 +66,8 @@ export class AuthGards implements CanActivate {
                 },
             );
 
-            req.accessToken = accessToken;
-            req.refreshToken = refreshToken;
+            req.accesstoken = accessToken;
+            req.refreshtoken = refreshToken;
             req.user = user;
 
         } catch(error) {

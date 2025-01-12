@@ -158,10 +158,19 @@ export class UsersService {
   async getLoggedInUser(req: any) {
     console.log('Request Object:', req)
     const user = req.user;
-    const refreshtoken = req.refreshToken;
-    const accesstoken = req.accessToken 
-    return { user, refreshtoken, accesstoken}
+    const accessToken = req.accesstoken 
+    const refreshToken = req.refreshtoken;
+    return { user, refreshToken, accessToken}
   }
+
+  // log out user 
+  async logoutUser(req: any) {
+    req.user = null;
+    req.refreshtoken = null;
+    req.accesstoken = null;
+    return { message: 'Logged out successfully!' };
+  }
+
 
   // get all users service 
   async getUsers() {
