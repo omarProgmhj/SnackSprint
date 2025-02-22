@@ -1,9 +1,11 @@
 import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar} from "@heroui/react";
-import React from 'react'
+import React, { useState }  from 'react'
 import { CgProfile } from "react-icons/cg";
+import AuthScreen from "../screens/AuthScreen";
 
 function ProfileDropDown() {
-  const [signedIn, setSignedIn] = React.useState(false);
+  const [signedIn, setSignedIn] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
 
@@ -30,9 +32,12 @@ function ProfileDropDown() {
             </DropdownMenu>
             </Dropdown>
         ) : (
-            <CgProfile />
+            <CgProfile 
+            className="text-2xl cursor-pointer"
+            onClick={() => setOpen(!open)}
+            />
         )}
-        <div></div>
+        {open && <AuthScreen />}
     </div>
   );
 }
