@@ -6,6 +6,10 @@ import { div } from "framer-motion/client";
 import styles from "../utils/styles";
 import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { useMutation } from "@apollo/client";
+import { LOGIN_USER } from "../graphql/actions/Login.action";
+
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -14,7 +18,10 @@ const formSchema = z.object({
 
 type LoginSchema = z.infer<typeof formSchema>;
 
-const Login = ({ setActiveState }: { setActiveState: (e: string) => void }) => {
+const Login = ({ setActiveState, setOpen }: { setActiveState: (e: string) => void; setOpen: (e: boolean) => void; }) => {
+
+  const [Login , {loading, error, data}] = useMutation(LOGIN_USER);
+
   const {
     register,
     handleSubmit,
@@ -22,11 +29,25 @@ const Login = ({ setActiveState }: { setActiveState: (e: string) => void }) => {
     reset,
   } = useForm<LoginSchema>({ resolver: zodResolver(formSchema) });
 
+
   const [showPassword, setShowPassword] = React.useState(false);
 
   const onSubmit = async (data: LoginSchema) => {
-    console.log(data);
-    reset();
+      const loginData = {
+        email: data.email,
+        password: data.password,
+      };
+      const response = await Login({
+        variables: loginData
+      });
+      if (response.data.Login.user) {
+        toast.success("Login Successful!");
+        setOpen(false);
+        reset();
+        window.location.reload();
+      } else {
+        toast.error(response.data.Login.error.message);
+      }
   };
   return (
     <div>
@@ -82,7 +103,7 @@ const Login = ({ setActiveState }: { setActiveState: (e: string) => void }) => {
           <input
             type="submit"
             value="Login"
-            disabled={isSubmitting}
+            disabled={isSubmitting || loading}
             className={`${styles.button} mt-3`}
           />
         </div>
