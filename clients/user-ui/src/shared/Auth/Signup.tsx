@@ -3,11 +3,11 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { div } from "framer-motion/client";
-import styles from "../utils/styles";
+import styles from "../../utils/styles";
 import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useMutation } from "@apollo/client";
-import { REGISTER_USER } from "../graphql/actions/register.action";
+import { REGISTER_USER } from "../../graphql/actions/register.action";
 import toast from "react-hot-toast";
 
 const formSchema = z.object({

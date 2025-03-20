@@ -26,34 +26,35 @@ export class AuthGards implements CanActivate {
         }
 
         if (accessToken) {
-            const decoded = this.jwtService.verify(accessToken, {
-                secret: this.config.get<string>('ACCESS_TOKEN_SECRET'),
-            });
-
-            if(!decoded) {
-                throw new UnauthorizedException("Invalid access token!");
+            const decoded = this.jwtService.decode(accessToken);
+      
+            const expirationTime = decoded?.exp;
+      
+            if (expirationTime * 1000 < Date.now()) {
+              await this.updateAccessToken(req);
             }
-            await this.updateAccessToken(req); 
-        }
+          }
         return true
     }
 
     private async updateAccessToken(req: any): Promise<void> {
         try {
-            const refreshToken = req.headers.refreshtoken as string;
-            const decoded = this.jwtService.verify(refreshToken, {
-                secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
-            });
-
-            
-            if (!decoded) {
-                throw new UnauthorizedException("Invalid refresh token!");
+            const refreshTokenData = req.headers.refreshtoken as string;
+  
+            const decoded = this.jwtService.decode(refreshTokenData);
+      
+            const expirationTime = decoded.exp * 1000;
+      
+            if (expirationTime < Date.now()) {
+              throw new UnauthorizedException(
+                'Please login to access this resource!',
+              );
             }
-
+      
             const user = await this.prisma.user.findUnique({
-                where: {
-                    id: decoded.id,
-                }
+              where: {
+                id: decoded.id,
+              },
             });
 
             const accessToken = this.jwtService.sign(
@@ -65,6 +66,13 @@ export class AuthGards implements CanActivate {
                     expiresIn: '15m',
                 },
             );
+            const refreshToken = this.jwtService.sign(
+                { id: user.id },
+                {
+                  secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
+                  expiresIn: '7d',
+                },
+              );
 
             req.accesstoken = accessToken;
             req.refreshtoken = refreshToken;

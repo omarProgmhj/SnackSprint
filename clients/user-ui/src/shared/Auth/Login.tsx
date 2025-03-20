@@ -3,11 +3,12 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { div } from "framer-motion/client";
-import styles from "../utils/styles";
+import styles from "../../utils/styles";
 import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useMutation } from "@apollo/client";
-import { LOGIN_USER } from "../graphql/actions/Login.action";
+import { LOGIN_USER } from "../../graphql/actions/Login.action";
+import Cookies from "js-cookie";
 
 import toast from "react-hot-toast";
 
@@ -42,6 +43,8 @@ const Login = ({ setActiveState, setOpen }: { setActiveState: (e: string) => voi
       });
       if (response.data.Login.user) {
         toast.success("Login Successful!");
+        Cookies.set("refreshToken", response.data.Login.refreshToken);
+        Cookies.set("accessToken", response.data.Login.accessToken);
         setOpen(false);
         reset();
         window.location.reload();
