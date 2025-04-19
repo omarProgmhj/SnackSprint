@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import styles from '../../utils/styles';
 import { useMutation } from '@apollo/client';
 import { FORGOT_PASSWORD } from '@/src/graphql/actions/forgot-password';
 import toast from 'react-hot-toast';
+import { error } from 'console';
 
 
 
@@ -18,30 +19,43 @@ type ForgotPasswordSchema = z.infer<typeof formSchema>;
 
 function ForgotPassword({setActiveState}: {setActiveState: (e: string) => void}) {
 
-    const [forgotPassword, { loading }] = useMutation(FORGOT_PASSWORD);
+    const {
+      register,
+      handleSubmit,
+      formState: { errors, isSubmitting },
+      reset,
+    } = useForm<ForgotPasswordSchema>({ resolver: zodResolver(formSchema) });
+
+    const [forgotPassword, { loading, data, error }] = useMutation(FORGOT_PASSWORD);
 
     const onSubmit = async (data: ForgotPasswordSchema) => {
-        try {
+        
           await forgotPassword({
             variables: {
               email: data.email
             }
           });
-          toast.success("Please check your email to reset your password");
-          reset();
-
-        } catch(error: any) {
-          toast.error(error.message);
-
-        }
     };
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-        reset,
-    } = useForm<ForgotPasswordSchema>({ resolver: zodResolver(formSchema) });
+    useEffect(() => {
+        if (data) {
+          toast.success(data.forgotPassword.message || "Please Check your email to reset your password");
+          reset();
+          setActiveState("nextStep");
+        }
+        if (error) {
+          if(error.graphQLErrors.length > 0) {
+            const message = error.graphQLErrors[0].message || "An error occurred";
+            toast.error(message);
+          } else if (error.networkError) {
+            toast.error("A network error occurred. Please check your connection");
+          } else {
+            toast.error(error.message || "Something went wrong");
+          }
+        }
+      }, [data, error, reset, setActiveState]);
+
+    
   return (
     <div>
       <h1 className={`${styles.title}`}>Forgot your password?</h1>
@@ -62,8 +76,8 @@ function ForgotPassword({setActiveState}: {setActiveState: (e: string) => void})
         <br />
         <input
           type="submit"
-          value="Submit"
-          disabled={isSubmitting }
+          value={ loading || isSubmitting ? "Submitting..." : "Submit"}
+          disabled={isSubmitting  || loading}
           className={`${styles.button} mt-3`}
         />
         <br />
