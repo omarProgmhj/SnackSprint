@@ -3,7 +3,7 @@ import { register } from 'module';
 import { ActivationDto, ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from './dto/user.dto';
 import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from '../../../prisma/Prisma.service';
+import { PrismaService } from '../prisma/Prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { response, Response } from 'express';
 import { User } from './entities/user.entity';

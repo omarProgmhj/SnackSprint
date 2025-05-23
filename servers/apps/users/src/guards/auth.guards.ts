@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from "../../../../prisma/Prisma.service";
+import { PrismaService } from "../../prisma/Prisma.service";
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 

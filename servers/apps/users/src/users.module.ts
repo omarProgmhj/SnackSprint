@@ -5,7 +5,7 @@ import { GraphQLModule, Context } from '@nestjs/graphql';
 import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../../../prisma/Prisma.service';
+import { PrismaService } from '../prisma/Prisma.service';
 import { UserResolver } from "./user.resolver";
 import { EmailModule } from './email/email.module';
 
